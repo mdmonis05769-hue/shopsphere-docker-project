@@ -1,0 +1,44 @@
+version: "3.9"
+
+services:
+
+  backend:
+    build: .
+    container_name: shopsphere-backend
+    ports:
+      - "5000:5000"
+    depends_on:
+      - mysql
+      - redis
+    networks:
+      - shopsphere-network
+
+  mysql:
+    image: mysql:8.0
+    container_name: shopsphere-mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root123
+      MYSQL_DATABASE: shopsphere
+      MYSQL_USER: shopsphere
+      MYSQL_PASSWORD: shop123
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+    networks:
+      - shopsphere-network
+
+  redis:
+    image: redis:latest
+    container_name: shopsphere-redis
+    ports:
+      - "6379:6379"
+    networks:
+      - shopsphere-network
+
+networks:
+  shopsphere-network:
+
+volumes:
+  mysql-data:
