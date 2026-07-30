@@ -1,36 +1,18 @@
 pipeline {
     agent any
 
-    environment {
-        APP_NAME = "ShopSphere"
-        PYTHON = "python3"
-    }
-
     stages {
-
-        stage('Checkout') {
-            steps {
-                echo "===== Checking out source code ====="
-                checkout scm
-            }
-        }
 
         stage('Repository Information') {
             steps {
-                sh '''
-                echo "Current Directory:"
-                pwd
-
-                echo "Repository Files:"
-                ls -la
-                '''
+                sh 'pwd'
+                sh 'ls -la'
             }
         }
 
         stage('Create Virtual Environment') {
             steps {
                 sh '''
-                rm -rf venv
                 python3 -m venv venv
                 '''
             }
@@ -40,7 +22,6 @@ pipeline {
             steps {
                 sh '''
                 . venv/bin/activate
-                pip install --upgrade pip
                 pip install -r requirements.txt
                 '''
             }
@@ -51,7 +32,6 @@ pipeline {
                 sh '''
                 . venv/bin/activate
                 python --version
-                pip --version
                 '''
             }
         }
@@ -60,7 +40,6 @@ pipeline {
             steps {
                 sh '''
                 . venv/bin/activate
-
                 python -m py_compile app.py
                 python -m py_compile db.py
                 python -m py_compile cache.py
@@ -68,33 +47,24 @@ pipeline {
             }
         }
 
-        stage('Workspace Information') {
+        stage('Build Docker Image') {
             steps {
                 sh '''
-                echo "Workspace Size:"
-                du -sh .
+                docker build -t shopsphere:latest .
+                '''
+            }
+        }
 
-                echo "Disk Usage:"
-                df -h
+        stage('Docker Images') {
+            steps {
+                sh '''
+                docker images
                 '''
             }
         }
     }
 
     post {
-
-        success {
-            echo "================================="
-            echo "Build Successful"
-            echo "================================="
-        }
-
-        failure {
-            echo "================================="
-            echo "Build Failed"
-            echo "================================="
-        }
-
         always {
             cleanWs()
         }
