@@ -1,13 +1,11 @@
-pipline {
-      agent any
+pipeline {
+    agent any
 
-    stage {
-
-    stage("Welcome") {
-         steps {
-              echo "Welcome to ShopSphere CI/CD Pipeline"
-         }
-     }
-
-   }
+    stages {
+        stage('Welcome') {
+            steps {
+                echo 'Welcome to ShopSphere CI/CD Pipeline'
+            }
+        }
+    }
 }
