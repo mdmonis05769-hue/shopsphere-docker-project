@@ -70,3 +70,42 @@ pipeline {
         }
     }
 }
+
+stage('Stop Old Container') {
+    steps {
+        sh '''
+        docker stop shopsphere || true
+        docker rm shopsphere || true
+        '''
+    }
+}
+
+stage('Run Docker Container') {
+    steps {
+        sh '''
+        docker run -d \
+        --name shopsphere \
+        -p 5000:5000 \
+        shopsphere:latest
+        '''
+    }
+}
+
+stage('Running Containers') {
+    steps {
+        sh '''
+        docker ps
+        '''
+    }
+}
+
+stage('Health Check') {
+    steps {
+        sh '''
+        sleep 10
+        curl http://localhost:5000/
+        '''
+    }
+}
+
+
